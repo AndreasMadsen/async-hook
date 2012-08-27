@@ -1,0 +1,27 @@
+{
+  "name": "async-hook",
+  "description": "Hook intro async methods",
+  "version": "0.1.0",
+  "author": "Andreas Madsen <amwebdk@gmail.com>",
+  "main": "./hook.js",
+  "scripts": {
+    "install": "node build.js",
+    "update": "node build.js"
+  },
+  "repository" : {
+    "type": "git",
+    "url": "git://github.com/AndreasMadsen/trace.git"
+  },
+  "keywords": [
+    "async",
+    "hook",
+    "monkey patch",
+    "callback",
+    "event"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": "0.8",
+    "npm": "1"
+  }
+}
