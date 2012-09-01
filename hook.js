@@ -41,8 +41,6 @@ function monkeyPatchModule(name) {
   if (patched.indexOf(name) !== -1) return;
   patched.push(name);
 
-  console.log(' === ' + name + ' === ');
-
   // load module object
   var root = require(name),
       moduleAPI = api[name];
@@ -52,7 +50,7 @@ function monkeyPatchModule(name) {
 
   // monkeypatch classes
   moduleAPI.classes.forEach(function (classAPI) {
-    var name = className;
+    var className = classAPI.name;
     var classObj = root[className];
     if (!classObj) return;
 
@@ -79,7 +77,7 @@ function monkeyPatchMethod(prefix, root, name) {
 
   var original = root[name];
   root[name] = function () {
-    var args = exports.callback._intercept(prefix, arguments);
+    var args = exports.callback._intercept(path, arguments);
     return original.apply(this, args);
   };
 }
@@ -133,10 +131,11 @@ Interceptor.prototype._intercept = function (path, args) {
   while (i--) if (typeof args[i] === 'function') break;
 
   // get new callback
+  var handlers = this.handlers.slice(0);
   var cb = args[i];
-  var l = this.handlers.length;
-  for (var n = 0; n < i; i++) {
-    var next = this.handlers[n](path, cb);
+  var l = handlers.length;
+  for (var n = 0; n < l; n++) {
+    var next = handlers[n](path, cb);
     if (typeof next === 'function') {
       cb = next;
       next = undefined;
