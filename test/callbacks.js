@@ -104,27 +104,27 @@ test("callback hook", function (t) {
     var server = require('net').createServer();
 
     // argument passed public to listen
-    function listenCallback(err, fd) {
+    function listenCallback() {
       t.equal(callOrder++, 1, 'real callback was executed after patch callback');
+      console.log('hi');
 
-      server.close(t.end.bind(t));
+      server.close(function () {
+        console.log('close');
+        t.end();
+      });
     }
 
     // attach monkey patch callback
     hook.callback.attach(function callbackAttach(name, callback) {
-      // BUG: event.EventEmtter.on should be here
-      if (name === 'events.EventEmitter.on' || name === 'process.nextTick') {
-        return callback;
-      }
+      if (name !== 'net.Server.listen') return callback;
 
-      // BUG: this isn't executed
       hook.callback.deattach(callbackAttach);
 
       t.equal(name, 'net.Server.listen', 'name argument in .attach is net.Server.listen');
       t.equal(callback, listenCallback, 'callback argument match input');
 
       // set a new callback
-      return function (err, fd) {
+      return function () {
         t.equal(callOrder++, 0, 'pached callback in correct order');
 
         // chain the callback
@@ -141,7 +141,7 @@ test("callback hook", function (t) {
     var callOrder = 0;
 
     // argument passed public to nextTick
-    function tickCallback(err, fd) {
+    function tickCallback() {
       t.equal(callOrder++, 1, 'real callback was executed after patch callback');
       t.end();
     }
@@ -154,7 +154,7 @@ test("callback hook", function (t) {
       t.equal(callback, tickCallback, 'callback argument match input');
 
       // set a new callback
-      return function (err, fd) {
+      return function () {
         t.equal(callOrder++, 0, 'pached callback is executed first');
 
         // chain the callback
