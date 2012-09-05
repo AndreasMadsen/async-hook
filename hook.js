@@ -15,9 +15,51 @@ try {
   throw new Error('async-hook was not installed correctly');
 }
 
-// create interceptors
-exports.callback = new Interceptor();
-exports.event = new Interceptor();
+// Exposed monkey patch API
+function Interceptor() {
+  this.handlers = [];
+}
+
+// internal method, takes a path (UUID) and a arguments object
+// - it returns a modified arguments object
+Interceptor.prototype._intercept = function (path, args) {
+  // find callback index
+  var i = args.length;
+  while (i--) if (typeof args[i] === 'function') break;
+
+  // get new callback
+  var handlers = this.handlers.slice(0);
+  var cb = args[i];
+  var l = handlers.length;
+  for (var n = 0; n < l; n++) {
+    var next = handlers[n](path, cb);
+    if (typeof next === 'function') {
+      cb = next;
+      next = undefined;
+    }
+  }
+
+  // overwrite the callback
+  args[i] = cb;
+  return args;
+};
+
+// Attach a interception handler
+Interceptor.prototype.attach = function (callback) {
+  this.handlers.push(callback);
+};
+
+// Deattach a interception handler
+Interceptor.prototype.deattach = function (callback) {
+  var index = this.handlers.indexOf(callback);
+  if (index === -1) return;
+
+  this.handlers.splice(index, 1);
+};
+
+// create exposed interceptors
+var callbackHook = exports.callback = new Interceptor();
+var eventHook = exports.event = new Interceptor();
 
 // To prevent a lot of noice, we will lazy monkey patch native modules as they
 // get required.
@@ -77,7 +119,7 @@ function monkeyPatchMethod(prefix, root, name) {
 
   var original = root[name];
   root[name] = function () {
-    var args = exports.callback._intercept(path, arguments);
+    var args = callbackHook._intercept(path, arguments);
     return original.apply(this, args);
   };
 }
@@ -89,14 +131,14 @@ function monkeyPatchMethod(prefix, root, name) {
   // monkeypatch EventEmitter.once
   var once = root.once;
   root.once = function () {
-    var args = exports.event._intercept('events.EventEmitter.once', arguments);
+    var args = eventHook._intercept('events.EventEmitter.once', arguments);
     return once.apply(this, args);
   };
 
   // monkeypatch EventEmitter.on and EventEmitter.addListener
   var on = root.on;
   root.on = root.addListener = function () {
-    var args = exports.callback._intercept('events.EventEmitter.on', arguments);
+    var args = eventHook._intercept('events.EventEmitter.on', arguments);
     return on.apply(this, args);
   };
 })();
@@ -117,45 +159,3 @@ monkeyPatchMethod('process', process, 'nextTick');
 // monkeypatch timer methods ('setTimeout', ...), since those are often
 // required by NativeModule.require and that can't be intercepted
 monkeyPatchModule('timers');
-
-// Exposed monkey patch API
-function Interceptor() {
-  this.handlers = [];
-}
-
-// internal method, takes a path (UUID) and a arguments object
-// - it returns a modified arguments object
-Interceptor.prototype._intercept = function (path, args) {
-  // find callback index
-  var i = args.length;
-  while (i--) if (typeof args[i] === 'function') break;
-
-  // get new callback
-  var handlers = this.handlers.slice(0);
-  var cb = args[i];
-  var l = handlers.length;
-  for (var n = 0; n < l; n++) {
-    var next = handlers[n](path, cb);
-    if (typeof next === 'function') {
-      cb = next;
-      next = undefined;
-    }
-  }
-
-  // overwrite the callback
-  args[i] = cb;
-  return args;
-};
-
-// Attach a interception handler
-Interceptor.prototype.attach = function (callback) {
-  this.handlers.push(callback);
-};
-
-// Deattach a interception handler
-Interceptor.prototype.deattach = function (callback) {
-  var index = this.handlers.indexOf(callback);
-  if (index === -1) return;
-
-  this.handlers.splice(index, 1);
-};
