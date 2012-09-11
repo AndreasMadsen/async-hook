@@ -98,20 +98,14 @@ test("callback hook", function (t) {
   });
 
   t.test("attach callback on class method", function (t) {
-    t.plan(4);
-
     var callOrder = 0;
     var server = require('net').createServer();
 
     // argument passed public to listen
     function listenCallback() {
       t.equal(callOrder++, 1, 'real callback was executed after patch callback');
-      console.log('hi');
 
-      server.close(function () {
-        console.log('close');
-        t.end();
-      });
+      server.close(t.end.bind(t));
     }
 
     // attach monkey patch callback
