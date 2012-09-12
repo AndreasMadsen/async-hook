@@ -1,7 +1,7 @@
 {
   "name": "async-hook",
   "description": "Hook intro async methods",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Andreas Madsen <amwebdk@gmail.com>",
   "main": "./hook.js",
   "scripts": {
