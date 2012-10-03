@@ -129,6 +129,37 @@ test("callback hook", function (t) {
     server.listen(0, listenCallback);
   });
 
+  t.test("this keyword on callback", function (t) {
+    var callOrder = 0;
+    var server = require('net').createServer();
+
+    // argument passed public to listen
+    function listenCallback() {
+      t.equal(this, server, 'this keyword match');
+      t.equal(callOrder++, 1, 'real callback was executed after patch callback');
+
+      server.close(t.end.bind(t));
+    }
+
+    // attach monkey patch callback
+    hook.callback.attach(function callbackAttach(name, callback) {
+      if (name !== 'net.Server.listen') return callback;
+
+      hook.callback.deattach(callbackAttach);
+
+      // set a new callback
+      return function () {
+        t.equal(this, server, 'this keyword match');
+        t.equal(callOrder++, 0, 'pached callback in correct order');
+
+        // chain the callback
+        return callback.apply(this, arguments);
+      };
+    });
+
+    server.listen(0, listenCallback);
+  });
+
   t.test("patch process.nextTick callback", function (t) {
     t.plan(4);
 

@@ -122,6 +122,35 @@ test("events hook", function (t) {
     e.emit('test', obj);
   });
 
+  t.test("this keyword in event handler", function (t) {
+    t.plan(4);
+
+    var e = new EventEmitter();
+    var callOrder = 0;
+
+    function eventHandler() {
+      t.equal(this, e, 'this keyword match');
+      t.equal(callOrder++, 1, 'real callback was executed after patch callback');
+      t.end();
+    }
+
+    // attach monkey patch callback
+    hook.event.attach(function eventAttach(name, callback) {
+      hook.event.deattach(eventAttach);
+
+      return function () {
+        t.equal(this, e, 'this keyword match');
+        t.equal(callOrder++, 0, 'pached callback is executed first');
+
+        // chain the callback
+        return callback.apply(this, arguments);
+      };
+    });
+
+    e.on('test', eventHandler);
+    e.emit('test');
+  });
+
   t.test('emitter.addListener and emitter.on are the same', function (t) {
     var e = new EventEmitter();
 
