@@ -1,6 +1,5 @@
 
 var flower = require('flower');
-var path = require('path');
 var http = require('http');
 var fs = require('fs');
 
@@ -9,7 +8,9 @@ var version = process.version,
     index = version.indexOf('-pre');
 
 if (index !== -1) {
-  version = version.slice(0, index);
+  version = version.slice(0, index).split('.');
+  version[2] = parseInt(version[2], 10) - 1;
+  version = version.join('.');
 }
 
 // get json documentation
