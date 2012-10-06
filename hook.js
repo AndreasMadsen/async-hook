@@ -131,14 +131,43 @@ function monkeyPatchMethod(prefix, root, name) {
   // monkeypatch EventEmitter.once
   var once = root.once;
   root.once = function () {
+    var origin = arguments[1];
     var args = eventHook._intercept('events.EventEmitter.once', arguments);
+
+    // .listener is a little nodejs secret, there makes removeListener work
+    // when monkey-patching an event handler.
+    args[1].listener = origin;
+
     return once.apply(this, args);
   };
 
   // monkeypatch EventEmitter.on and EventEmitter.addListener
   var on = root.on;
   root.on = root.addListener = function () {
+    var origin = arguments[1];
+
+    // if .on was called from .once
+    if (typeof origin.listener === 'function') {
+
+      // restore the input function attachment
+      if (typeof origin.listener.listener === 'function') {
+
+        // origin will be a node internal g() function
+        // origin.lisenter will be attach(input);
+        // origin.lisenter.lisenter will be input;
+        // where input is event.once('name', input);
+        arguments[1].listener = origin.listener.listener;
+      }
+
+      return on.apply(this, arguments);
+    }
+
     var args = eventHook._intercept('events.EventEmitter.on', arguments);
+
+    // .listener is a little nodejs secret, there makes removeListener work
+    // when monkey-patching an event handler.
+    args[1].listener = origin;
+
     return on.apply(this, args);
   };
 })();

@@ -158,4 +158,110 @@ test("events hook", function (t) {
     t.end();
   });
 
+  t.test('e.once self removeing', function (t) {
+
+    // attach a simple patcher
+    function eventAttach(name, callback) {
+      return function () {
+        callback.apply(this, arguments);
+      };
+    }
+    hook.event.attach(eventAttach);
+
+    // expected to be executed
+    function boo() {
+      t.end();
+    }
+
+    // create EventEmitter objecct
+    var e = new EventEmitter();
+
+    // check that the final newListener is equal to boo
+    e.once('newListener', function (name, fn) {
+        t.equal(fn, boo);
+    });
+
+    // add boo event handler
+    e.once('boo', boo, 'input fn was boo()');
+
+    // expect boo to execute
+    e.emit('boo');
+
+    // do not expect boo to execute
+    e.emit('boo');
+
+    // cleanup
+    hook.event.deattach(eventAttach);
+  });
+
+  t.test('e.once manual remove', function (t) {
+
+    // attach a simple patcher
+    function eventAttach(name, callback) {
+      return function () {
+        callback.apply(this, arguments);
+      };
+    }
+    hook.event.attach(eventAttach);
+
+    // do not expect this to execute
+    function boo() {
+      t.end();
+    }
+
+    // create EventEmitter object
+    var e = new EventEmitter();
+
+    // check that the final newLisenter is equal to boo
+    e.once('newListener', function (name, fn) {
+        t.equal(fn, boo, 'input fn was boo()');
+    });
+
+    // do not expect boo to execute
+    e.once('boo', boo);
+    e.removeListener('boo', boo);
+    e.emit('boo');
+
+    // cleanup
+    hook.event.deattach(eventAttach);
+
+    // done
+    t.end();
+  });
+
+  t.test('e.on manual remove', function (t) {
+
+    // attach a simple patcher
+    function eventAttach(name, callback) {
+      return function () {
+        callback.apply(this, arguments);
+      };
+    }
+    hook.event.attach(eventAttach);
+
+    // do not expect this to execute
+    function boo() {
+      t.end();
+    }
+
+    // create EventEmitter object
+    var e = new EventEmitter();
+
+    // check that the final newLisenter is equal to boo
+    e.once('newListener', function (name, fn) {
+        t.equal(fn, boo, 'input fn was boo()');
+    });
+
+    // do not expect boo to execute
+    e.on('boo', boo);
+    e.removeListener('boo', boo);
+    e.emit('boo');
+
+    // cleanup
+    hook.event.deattach(eventAttach);
+
+    // done
+    t.end();
+  });
+
 });
