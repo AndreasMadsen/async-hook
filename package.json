@@ -1,0 +1,28 @@
+{
+  "name": "async-hook",
+  "description": "Inspect the life of handle objects in node",
+  "version": "1.0.0",
+  "author": "Andreas Madsen <amwebdk@gmail.com>",
+  "main": "./trace.js",
+  "scripts": {
+    "test": "tap ./test/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/AndreasMadsen/async-hook.git"
+  },
+  "keywords": [
+    "async",
+    "async hooks",
+    "inspect",
+    "async wrap"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "async": "1.5.x",
+    "cli-color": "1.1.x"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}
