@@ -99,6 +99,9 @@ function AsyncHook() {
   this._state = new State();
   this._hooks = new Hooks();
 
+  // expose version for conflict detection
+  this.version = require('./package.json').version;
+
   // expose the Providers map
   this.providers = asyncWrap.Providers;
 
@@ -110,6 +113,7 @@ function AsyncHook() {
   // setup async wrap
   asyncWrap.setupHooks(this._hooks.init, this._hooks.pre, this._hooks.post, this._hooks.destroy);
 }
+module.exports = AsyncHook;
 
 AsyncHook.prototype.addHooks = function (hooks) {
   this._hooks.add(hooks);
@@ -128,5 +132,3 @@ AsyncHook.prototype.disable = function () {
   this._state.enabled = false;
   asyncWrap.disable();
 };
-
-module.exports = new AsyncHook();

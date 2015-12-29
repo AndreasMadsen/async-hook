@@ -1,6 +1,6 @@
 'use strict';
 
-const asyncHook = require('../async-hook.js');
+const asyncHook = require('../');
 const assert = require('assert');
 
 let called = false;

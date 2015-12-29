@@ -3,9 +3,9 @@
   "description": "Inspect the life of handle objects in node",
   "version": "1.0.0",
   "author": "Andreas Madsen <amwebdk@gmail.com>",
-  "main": "./trace.js",
+  "main": "./index.js",
   "scripts": {
-    "test": "tap ./test/*"
+    "test": "node ./test/runner.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,9 @@
     "async wrap"
   ],
   "license": "MIT",
+  "dependencies": {
+    "stack-chain": "~1.3.1"
+  },
   "devDependencies": {
     "async": "1.5.x",
     "cli-color": "1.1.x"
