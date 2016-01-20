@@ -5,6 +5,7 @@ const TIMERWRAP = asyncWrap.Providers.TIMERWRAP;
 
 const patchs = {
   'nextTick': require('./patches/next-tick.js'),
+  'promise': require('./patches/promise.js'),
   'timers': require('./patches/timers.js')
 };
 
