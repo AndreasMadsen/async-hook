@@ -7,6 +7,11 @@ module.exports = function patchPromise() {
   const state = this._state;
 
   const Promise = global.Promise;
+
+  /* As per ECMAScript 2015, .catch must be implemented by calling .then, as
+   * such we need needn't patch .catch as well. see:
+   * http://www.ecma-international.org/ecma-262/6.0/#sec-promise.prototype.catch
+   */
   const oldThen = Promise.prototype.then;
   Promise.prototype.then = wrappedThen;
 
