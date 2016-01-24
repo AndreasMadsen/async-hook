@@ -48,11 +48,11 @@ asyncHook.addHooks({
 asyncHook.enable();
 
 Promise
-	.reject('a')
-	.then(null, _arg => {
-		called = true;
-		arg = _arg;
-	});
+  .reject('a')
+  .then(null, _arg => {
+    called = true;
+    arg = _arg;
+  });
 
 asyncHook.disable();
 
