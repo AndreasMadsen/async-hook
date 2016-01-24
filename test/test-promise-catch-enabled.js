@@ -3,8 +3,8 @@
 const asyncHook = require('../');
 const assert = require('assert');
 
-let called = false;
-let arg = null;
+let rejctedCalled = false;
+let rejectedArg = null;
 
 let initCalls = 0;
 let destroyCalls = 0;
@@ -49,9 +49,9 @@ asyncHook.enable();
 
 Promise
   .reject('a')
-  .catch(_arg => {
-    called = true;
-    arg = _arg;
+  .catch(arg => {
+    rejctedCalled = true;
+    rejectedArg = arg;
   });
 
 asyncHook.disable();
@@ -68,8 +68,8 @@ process.once('exit', function () {
   assert.equal(initParent, null);
   assert.equal(initProvider, 0);
 
-  assert.equal(called, true);
-  assert.equal(arg, 'a');
+  assert.equal(rejctedCalled, true);
+  assert.equal(rejectedArg, 'a');
   assert.equal(initCalls, 1);
   assert.equal(destroyCalls, 1);
 });

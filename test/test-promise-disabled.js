@@ -3,14 +3,14 @@
 const asyncHook = require('../');
 const assert = require('assert');
 
-const thenCalled1 = [false, false];
-const thenCalled2 = [false, false];
-let catchCalled1 = false;
-let catchCalled2 = false;
+const thenHandlersCalledA = [false, false];
+const thenHandlersCalledB = [false, false];
+let catchHandlerCalledC = false;
+let catchHandlerCalledD = false;
 
-let arg1 = null;
-let arg2 = null;
-let arg3 = null;
+let fulfilledArgA = null;
+let rejectedArgB = null;
+let rejectedArgC = null;
 
 asyncHook.addHooks({
   init: function () {
@@ -32,41 +32,41 @@ asyncHook.disable();
 
 Promise
   .resolve('a')
-  .then(_arg => {
-    arg1 = _arg;
-    thenCalled1[0] = true;
+  .then(arg => {
+    fulfilledArgA = arg;
+    thenHandlersCalledA[0] = true;
   }, () => {
-    thenCalled1[1] = true;
+    thenHandlersCalledA[1] = true;
   });
 
 Promise
   .reject('b')
   .then(() => {
-    thenCalled2[0] = true;
-  }, _arg => {
-    arg2 = _arg
-    thenCalled2[1] = true;
+    thenHandlersCalledB[0] = true;
+  }, arg => {
+    rejectedArgB = arg;
+    thenHandlersCalledB[1] = true;
   });
 
 Promise
   .reject('c')
-  .catch(_arg => {
-    arg3 = _arg;
-    catchCalled1 = true;
+  .catch(arg => {
+    rejectedArgC = arg;
+    catchHandlerCalledC = true;
   });
 
 Promise
   .resolve('d')
   .catch(() => {
-    catchCalled2 = true;
+    catchHandlerCalledD = true;
   });
 
 process.once('exit', function () {
-  assert.deepStrictEqual(thenCalled1, [true, false]);
-  assert.equal(arg1, 'a');
-  assert.deepStrictEqual(thenCalled2, [false, true]);
-  assert.equal(arg2, 'b');
-  assert.equal(catchCalled1, true);
-  assert.equal(arg3, 'c');
-  assert.equal(catchCalled2, false);
+  assert.deepStrictEqual(thenHandlersCalledA, [true, false]);
+  assert.equal(fulfilledArgA, 'a');
+  assert.deepStrictEqual(thenHandlersCalledB, [false, true]);
+  assert.equal(rejectedArgB, 'b');
+  assert.equal(catchHandlerCalledC, true);
+  assert.equal(rejectedArgC, 'c');
+  assert.equal(catchHandlerCalledD, false);
 });
