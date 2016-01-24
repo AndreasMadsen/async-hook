@@ -6,6 +6,7 @@
     "es6": true
   },
   "rules": {
+    "indent": [2, 2],
     "quotes": [1, "single", "avoid-escape"],
     "curly": 0,
     "strict": [2, "global"],

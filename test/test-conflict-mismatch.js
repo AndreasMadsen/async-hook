@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const existing = global._asyncHook = {
+global._asyncHook = {
   version: '0.0.0'
 };
 
