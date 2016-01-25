@@ -15,8 +15,12 @@ module.exports = function patchPromise() {
   const oldThen = Promise.prototype.then;
   Promise.prototype.then = wrappedThen;
 
-  function makeWrappedHandler(fn, handle, uid) {
-    if ('function' !== typeof fn) return fn;
+  function makeWrappedHandler(fn, handle, uid, isOnFulfilled) {
+    if ('function' !== typeof fn) {
+      return isOnFulfilled
+        ? makeUnhandledResolutionHandler(uid)
+        : makeUnhandledRejectionHandler(uid);
+    }
 
     return function wrappedHandler() {
       hooks.pre.call(handle);
@@ -26,6 +30,20 @@ module.exports = function patchPromise() {
         hooks.post.call(handle);
         hooks.destroy.call(null, uid);
       }
+    };
+  }
+
+  function makeUnhandledResolutionHandler(uid) {
+    return function unhandledResolutionHandler(val) {
+      hooks.destroy.call(null, uid);
+      return val;
+    };
+  }
+
+  function makeUnhandledRejectionHandler(uid) {
+    return function unhandledRejectedHandler(val) {
+      hooks.destroy.call(null, uid);
+      throw val;
     };
   }
 
@@ -39,8 +57,8 @@ module.exports = function patchPromise() {
 
     return oldThen.call(
       this,
-      makeWrappedHandler(onFulfilled, handle, uid),
-      makeWrappedHandler(onRejected, handle, uid)
+      makeWrappedHandler(onFulfilled, handle, uid, true),
+      makeWrappedHandler(onRejected, handle, uid, false)
     );
   }
 };
