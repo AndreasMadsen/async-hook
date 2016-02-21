@@ -23,11 +23,11 @@ module.exports = function patchPromise() {
     }
 
     return function wrappedHandler() {
-      hooks.pre.call(handle);
+      hooks.pre.call(handle, uid);
       try {
         return fn.apply(this, arguments);
       } finally {
-        hooks.post.call(handle);
+        hooks.post.call(handle, uid);
         hooks.destroy.call(null, uid);
       }
     };
@@ -53,7 +53,7 @@ module.exports = function patchPromise() {
     const handle = new PromiseWrap();
     const uid = --state.counter;
 
-    hooks.init.call(handle, 0, uid, null);
+    hooks.init.call(handle, uid, 0, null, null);
 
     return oldThen.call(
       this,

@@ -9,7 +9,6 @@ const patchs = {
   'timers': require('./patches/timers.js')
 };
 
-const uidSymbol = Symbol('async-hook-uid');
 const ignoreUIDs = new Set();
 
 function State() {
@@ -23,19 +22,12 @@ function Hooks() {
   const postFns = this.postFns = [];
   const destroyFns = this.destroyFns = [];
 
-  this.init = function (provider, uid, parentHandle) {
-    this[uidSymbol] = uid;
-
+  this.init = function (uid, provider, parentUid, parentHandle) {
     // Ignore TIMERWRAP, since setTimeout etc. is monkey patched
     if (provider === TIMERWRAP) {
       ignoreUIDs.add(uid);
       return;
     }
-
-    // send the parent uid, not the parent handle. The user map the handle
-    // objects appropiatly if needed.
-    let parentUid = null;
-    if (parentHandle !== null) parentUid = parentHandle[uidSymbol];
 
     // call hooks
     for (const hook of initFns) {
@@ -43,8 +35,7 @@ function Hooks() {
     }
   };
 
-  this.pre = function () {
-    const uid = this[uidSymbol];
+  this.pre = function (uid) {
     if (ignoreUIDs.has(uid)) return;
 
     // call hooks
@@ -53,8 +44,7 @@ function Hooks() {
     }
   };
 
-  this.post = function () {
-    const uid = this[uidSymbol];
+  this.post = function (uid) {
     if (ignoreUIDs.has(uid)) return;
 
     // call hooks

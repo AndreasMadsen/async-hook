@@ -40,17 +40,17 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
     let timerId;
 
     // call the init hook
-    hooks.init.call(handle, 0, uid, null);
+    hooks.init.call(handle, uid, 0, null, null);
 
     // overwrite callback
     args[0] = function () {
       // call the pre hook
-      hooks.pre.call(handle);
+      hooks.pre.call(handle, uid);
 
       callback.apply(this, arguments);
 
       // call the post hook
-      hooks.post.call(handle);
+      hooks.post.call(handle, uid);
 
       // call thie destroy hook if the callback will only be called once
       if (singleCall) {
