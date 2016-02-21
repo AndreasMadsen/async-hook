@@ -24,7 +24,7 @@ const asyncHook = require('async-hook');
 The function arguments are:
 
 ```javascript
-function init(uid, handle, provider, parent) { /* your code */ }
+function init(uid, handle, provider, parentUid, parentHandle) { /* your code */ }
 function pre(uid, handle) {  /* your code */ }
 function post(uid, handle) {  /* your code */ }
 function destroy(uid) {  /* your code */ }

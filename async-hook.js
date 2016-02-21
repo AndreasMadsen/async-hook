@@ -23,7 +23,7 @@ function Hooks() {
   const postFns = this.postFns = [];
   const destroyFns = this.destroyFns = [];
 
-  this.init = function (provider, uid, parent) {
+  this.init = function (provider, uid, parentHandle) {
     this[uidSymbol] = uid;
 
     // Ignore TIMERWRAP, since setTimeout etc. is monkey patched
@@ -34,11 +34,12 @@ function Hooks() {
 
     // send the parent uid, not the parent handle. The user map the handle
     // objects appropiatly if needed.
-    if (parent !== null) parent = parent[uidSymbol];
+    let parentUid = null;
+    if (parentHandle !== null) parentUid = parentHandle[uidSymbol];
 
     // call hooks
     for (const hook of initFns) {
-      hook(uid, this, provider, parent);
+      hook(uid, this, provider, parentUid, parentHandle);
     }
   };
 
