@@ -22,7 +22,10 @@ const stackChain = require('stack-chain');
 // and the hooks are expected to be completely transparent.
 stackChain.filter.attach(function (error, frames) {
   return frames.filter(function (callSite) {
-    return callSite.getFileName().slice(0, __dirname.length) !== __dirname;
+    const filename = callSite.getFileName();
+    // filename is not always a string, for example in case of eval it is
+    // undefined. So check if the filename is defined.
+    return !(filename && filename.slice(0, __dirname.length) === __dirname);
   });
 });
 
