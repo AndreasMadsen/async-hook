@@ -103,7 +103,12 @@ function AsyncHook() {
   }
 
   // setup async wrap
-  asyncWrap.setupHooks(this._hooks.init, this._hooks.pre, this._hooks.post, this._hooks.destroy);
+  asyncWrap.setupHooks({
+    init: this._hooks.init,
+    pre: this._hooks.pre,
+    post: this._hooks.post,
+    destroy: this._hooks.destroy
+  });
 }
 module.exports = AsyncHook;
 
