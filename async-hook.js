@@ -103,12 +103,17 @@ function AsyncHook() {
   }
 
   // setup async wrap
-  asyncWrap.setupHooks({
-    init: this._hooks.init,
-    pre: this._hooks.pre,
-    post: this._hooks.post,
-    destroy: this._hooks.destroy
-  });
+  const isNodeV4 = /^v4\./.test(process.version);
+  if (isNodeV4) {
+    asyncWrap.setupHooks(this._hooks.init, this._hooks.pre, this._hooks.post, this._hooks.destroy);
+  } else {
+    asyncWrap.setupHooks({
+      init: this._hooks.init,
+      pre: this._hooks.pre,
+      post: this._hooks.post,
+      destroy: this._hooks.destroy
+    });
+  }
 }
 module.exports = AsyncHook;
 
