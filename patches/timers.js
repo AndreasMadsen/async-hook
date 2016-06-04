@@ -35,6 +35,10 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
     const args = Array.from(arguments);
     const callback = args[0];
 
+    if (typeof callback !== 'function') {
+      throw new TypeError('"callback" argument must be a function');
+    }
+
     const handle = new Handle();
     const uid = --state.counter;
     let timerId;

@@ -13,6 +13,10 @@ module.exports = function patch() {
     const args = Array.from(arguments);
     const callback = args[0];
 
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback is not a function');
+    }
+
     const handle = new NextTickWrap();
     const uid = --state.counter;
 
