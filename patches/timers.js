@@ -41,7 +41,7 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
 
     const handle = new Handle();
     const uid = --state.counter;
-    let timerId;
+    let timerId = undefined;
 
     // call the init hook
     hooks.init.call(handle, uid, 0, null, null);
@@ -51,12 +51,26 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
       // call the pre hook
       hooks.pre.call(handle, uid);
 
-      callback.apply(this, arguments);
+      let didThrow = true;
+      try {
+        callback.apply(this, arguments);
+        didThrow = false;
+      } finally {
+        if (didThrow) {
+          process.once('uncaughtException', function () {
+            // call the post hook
+            hooks.post.call(handle, uid, true);
+            // setInterval won't continue
+            timerMap.delete(timerId);
+            hooks.destroy.call(null, uid);
+          });
+        }
+      }
 
       // call the post hook
-      hooks.post.call(handle, uid);
+      hooks.post.call(handle, uid, false);
 
-      // call thie destroy hook if the callback will only be called once
+      // call the destroy hook if the callback will only be called once
       if (singleCall) {
         timerMap.delete(timerId);
         hooks.destroy.call(null, uid);

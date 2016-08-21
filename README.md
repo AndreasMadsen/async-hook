@@ -26,7 +26,7 @@ The function arguments are:
 ```javascript
 function init(uid, handle, provider, parentUid, parentHandle) { /* your code */ }
 function pre(uid, handle) {  /* your code */ }
-function post(uid, handle) {  /* your code */ }
+function post(uid, handle, didThrow) {  /* your code */ }
 function destroy(uid) {  /* your code */ }
 ```
 

@@ -27,7 +27,7 @@ module.exports = function patchPromise() {
       try {
         return fn.apply(this, arguments);
       } finally {
-        hooks.post.call(handle, uid);
+        hooks.post.call(handle, uid, false);
         hooks.destroy.call(null, uid);
       }
     };

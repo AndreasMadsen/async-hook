@@ -28,10 +28,21 @@ module.exports = function patch() {
       // call the pre hook
       hooks.pre.call(handle, uid);
 
-      callback.apply(this, arguments);
+      let didThrow = true;
+      try {
+        callback.apply(this, arguments);
+        didThrow = false;
+      } finally {
+        if (didThrow) {
+          process.once('uncaughtException', function () {
+            hooks.post.call(handle, uid, true);
+            hooks.destroy.call(null, uid);
+          });
+        }
+      }
 
       // call the post hook, followed by the destroy hook
-      hooks.post.call(handle, uid);
+      hooks.post.call(handle, uid, false);
       hooks.destroy.call(null, uid);
     };
 

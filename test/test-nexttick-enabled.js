@@ -15,6 +15,7 @@ let initProvider = NaN;
 
 let preHandle = {};
 let preUid = NaN;
+let postDidThrow = NaN;
 
 let postHandle = {};
 let postUid = NaN;
@@ -34,9 +35,10 @@ asyncHook.addHooks({
     preUid = uid;
     preHandle = handle;
   },
-  post: function (uid, handle) {
+  post: function (uid, handle, didThrow) {
     postUid = uid;
     postHandle = handle;
+    postDidThrow = didThrow;
   },
   destroy: function (uid) {
     destroyUid = uid;
@@ -65,6 +67,8 @@ process.once('exit', function () {
   assert.equal(initHandle.constructor.name, 'NextTickWrap');
   assert.equal(initParent, null);
   assert.equal(initProvider, 0);
+
+  assert.equal(postDidThrow, false);
 
   assert.equal(called, true);
   assert.equal(initCalls, 1);

@@ -19,6 +19,7 @@ let preUid = NaN;
 
 let postHandle = {};
 let postUid = NaN;
+let postDidThrow = NaN;
 
 let destroyUid = NaN;
 
@@ -35,9 +36,10 @@ asyncHook.addHooks({
     preUid = uid;
     preHandle = handle;
   },
-  post: function (uid, handle) {
+  post: function (uid, handle, didThrow) {
     postUid = uid;
     postHandle = handle;
+    postDidThrow = didThrow;
   },
   destroy: function (uid) {
     destroyUid = uid;
@@ -64,6 +66,8 @@ process.once('exit', function () {
   assert.equal(initHandle.constructor.name, 'FSReqWrap');
   assert.equal(initParent, null);
   assert.equal(initProvider, asyncHook.providers.FSREQWRAP);
+
+  assert.equal(postDidThrow, false);
 
   assert.equal(called, true);
   assert.equal(initCalls, 1);

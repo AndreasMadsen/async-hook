@@ -44,12 +44,12 @@ function Hooks() {
     }
   };
 
-  this.post = function (uid) {
+  this.post = function (uid, didThrow) {
     if (ignoreUIDs.has(uid)) return;
 
     // call hooks
     for (const hook of postFns) {
-      hook(uid, this);
+      hook(uid, this, didThrow);
     }
   };
 
