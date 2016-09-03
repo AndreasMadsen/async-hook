@@ -32,8 +32,6 @@ module.exports = function patch() {
       try {
         callback.apply(this, arguments);
         didThrow = false;
-      } catch(e) {
-        throw e;
       } finally {
         // call the post hook, followed by the destroy hook
         hooks.post.call(handle, uid, didThrow);
