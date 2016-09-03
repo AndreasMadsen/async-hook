@@ -56,7 +56,10 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
         callback.apply(this, arguments);
         didThrow = false;
       } finally {
-        if (didThrow) {
+        // If `callback` threw and there is an uncaughtException handler
+        // then call the `post` and `destroy` hook after the uncaughtException
+        // user handlers have been invoked.
+        if (didThrow && process.listenerCount('uncaughtException') > 0) {
           process.once('uncaughtException', function () {
             // call the post hook
             hooks.post.call(handle, uid, true);
@@ -67,7 +70,7 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
         }
       }
 
-      // call the post hook
+      // callback done successfully
       hooks.post.call(handle, uid, false);
 
       // call the destroy hook if the callback will only be called once

@@ -33,7 +33,10 @@ module.exports = function patch() {
         callback.apply(this, arguments);
         didThrow = false;
       } finally {
-        if (didThrow) {
+        // If `callback` threw and there is an uncaughtException handler
+        // then call the `post` and `destroy` hook after the uncaughtException
+        // user handlers have been invoked.
+        if(didThrow && process.listenerCount('uncaughtException') > 0) {
           process.once('uncaughtException', function () {
             hooks.post.call(handle, uid, true);
             hooks.destroy.call(null, uid);
@@ -41,7 +44,7 @@ module.exports = function patch() {
         }
       }
 
-      // call the post hook, followed by the destroy hook
+      // callback done successfully
       hooks.post.call(handle, uid, false);
       hooks.destroy.call(null, uid);
     };
