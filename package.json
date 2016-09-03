@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "async": "1.5.x",
-    "cli-color": "1.1.x"
+    "cli-color": "1.1.x",
+    "eslint": "^3.4.0"
   },
   "engines": {
     "node": "^4.5 || ^5.10 || ^6.0"
