@@ -40,7 +40,7 @@ process.once('exit', function () {
   assert.strictEqual(throwFlag, true);
   assert.deepEqual(eventOrder, [
     'init#-1 NextTickWrap', 'pre#-1',
-    'callback', 'exception',
-    'post#-1', 'destroy#-1'
+    'callback',
+    'post#-1', 'destroy#-1', 'exception'
   ]);
 });

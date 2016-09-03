@@ -39,7 +39,12 @@ function runTest(filename, done) {
   });
 
   p.once('close', function (statusCode) {
-    const ok = (statusCode === 0);
+    const ok = function () {
+      if(filename === 'test-nexttick-exception.js' && statusCode === 1) {
+        return true;
+      }
+      return statusCode === 0;
+    }();
 
     if (ok) {
       console.log(' ' + passed('ok'));

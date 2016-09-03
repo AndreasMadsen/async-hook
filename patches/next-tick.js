@@ -32,18 +32,13 @@ module.exports = function patch() {
       try {
         callback.apply(this, arguments);
         didThrow = false;
+      } catch(e) {
+        throw e;
       } finally {
-        if (didThrow) {
-          process.once('uncaughtException', function () {
-            hooks.post.call(handle, uid, true);
-            hooks.destroy.call(null, uid);
-          });
-        }
+        // call the post hook, followed by the destroy hook
+        hooks.post.call(handle, uid, didThrow);
+        hooks.destroy.call(null, uid);
       }
-
-      // call the post hook, followed by the destroy hook
-      hooks.post.call(handle, uid, false);
-      hooks.destroy.call(null, uid);
     };
 
     return oldNextTick.apply(process, args);
