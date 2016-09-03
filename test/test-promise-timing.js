@@ -31,7 +31,6 @@ new Promise(function (s) {
 .then();
 
 process.once('exit', function () {
-  process._rawDebug(eventOrder);
   assert.deepEqual(eventOrder, [
     'init#-1 TimeoutWrap',
     'init#-2 PromiseWrap',
