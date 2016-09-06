@@ -33,9 +33,11 @@ module.exports = function patch() {
         callback.apply(this, arguments);
         didThrow = false;
       } finally {
-        // call the post hook, followed by the destroy hook
-        hooks.post.call(handle, uid, didThrow);
-        hooks.destroy.call(null, uid);
+        process.once('uncaughtException', function () {
+          // call the post hook, followed by the destroy hook
+          hooks.post.call(handle, uid, didThrow);
+          hooks.destroy.call(null, uid);
+        });
       }
     };
 
