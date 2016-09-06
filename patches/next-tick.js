@@ -6,6 +6,7 @@ module.exports = function patch() {
   const hooks = this._hooks;
   const state = this._state;
 
+  const oldFatalException = process._fatalException;
   const oldNextTick = process.nextTick;
   process.nextTick = function () {
     if (!state.enabled) return oldNextTick.apply(process, arguments);
@@ -33,11 +34,27 @@ module.exports = function patch() {
         callback.apply(this, arguments);
         didThrow = false;
       } finally {
-        process.once('uncaughtException', function () {
-          // call the post hook, followed by the destroy hook
-          hooks.post.call(handle, uid, didThrow);
+        if(didThrow) {
+          // callback throws
+          if(process.listenerCount('uncaughtException') === 0) {
+            // we cannot use `uncaughtException` event or the process won't exit as normal
+            process._fatalException = function (e) {
+              process._fatalException = oldFatalException;
+              hooks.post.call(handle, uid, true);
+              hooks.destroy.call(null, uid);
+              oldFatalException.call(process, e);
+            };
+          } else {
+            process.once('uncaughtException', function () {
+              hooks.post.call(handle, uid, true);
+              hooks.destroy.call(null, uid);
+            });
+          }
+        } else {
+          // callback done successfully
+          hooks.post.call(handle, uid, false);
           hooks.destroy.call(null, uid);
-        });
+        }
       }
     };
 

@@ -40,8 +40,8 @@ function runTest(filename, done) {
 
   p.once('close', function (statusCode) {
     const ok = function () {
-      if(filename === 'test-nexttick-exception.js' && statusCode === 1) {
-        return true;
+      if(filename === 'test-nexttick-exception.js') {
+        return statusCode === 1;
       }
       return statusCode === 0;
     }();
