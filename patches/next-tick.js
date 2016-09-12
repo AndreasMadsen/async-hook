@@ -33,17 +33,19 @@ module.exports = function patch() {
         callback.apply(this, arguments);
         didThrow = false;
       } finally {
-        if (didThrow) {
+        if(didThrow && process.listenerCount('uncaughtException') > 0) {
+          // Callback throws and there is at least one listener for `uncaughtException` event, so that process won't quit abrutly.
           process.once('uncaughtException', function () {
             hooks.post.call(handle, uid, true);
             hooks.destroy.call(null, uid);
           });
+          // or, the process exits with non-zero status code and both `post` and `destroy` hooks won't be called.
+        } else {
+          // callback done successfully
+          hooks.post.call(handle, uid, false);
+          hooks.destroy.call(null, uid);
         }
       }
-
-      // call the post hook, followed by the destroy hook
-      hooks.post.call(handle, uid, false);
-      hooks.destroy.call(null, uid);
     };
 
     return oldNextTick.apply(process, args);

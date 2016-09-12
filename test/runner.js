@@ -38,8 +38,19 @@ function runTest(filename, done) {
     stdio: ['ignore', 1, 2]
   });
 
+  // test cases that are expected to exit with status code 1
+  const exceptionCases = [
+    'test-nexttick-exception.js',
+    'test-timer-exception.js'
+  ];
+
   p.once('close', function (statusCode) {
-    const ok = (statusCode === 0);
+    const ok = function () {
+      if(exceptionCases.indexOf(filename) > -1) {
+        return statusCode === 1;
+      }
+      return statusCode === 0;
+    }();
 
     if (ok) {
       console.log(' ' + passed('ok'));

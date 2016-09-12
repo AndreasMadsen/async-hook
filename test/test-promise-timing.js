@@ -42,13 +42,9 @@ process.once('exit', function () {
     'init#-4 TimeoutWrap',
     'post#-2',
     'destroy#-2',
-    'init#-5 PromiseWrap',
     'pre#-4',
     'post#-4',
     'destroy#-4',
-    'pre#-5',
-    'post#-5',
-    'destroy#-5',
     'destroy#-3'
   ]);
 });
