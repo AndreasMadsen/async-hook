@@ -56,7 +56,7 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
         callback.apply(this, arguments);
         didThrow = false;
       } finally {
-        if (didThrow) {
+        if (didThrow && process.listenerCount('uncaughtException') > 0) {
           process.once('uncaughtException', function () {
             // call the post hook
             hooks.post.call(handle, uid, true);
