@@ -103,6 +103,7 @@ function AsyncHook() {
   }
 
   // setup async wrap
+  console.error('warning: you are using async-hook which is unstable.');
   asyncWrap.setupHooks({
     init: this._hooks.init,
     pre: this._hooks.pre,
