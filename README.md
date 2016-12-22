@@ -13,7 +13,7 @@ it exists as an userland module.
 
 For the details of how AsyncWrap works and by extension how this module works,
 please see the semi-official AsyncWrap documentation:
-https://github.com/nodejs/tracing-wg/blob/master/docs/AsyncWrap/README.md
+https://github.com/nodejs/diagnostics/blob/master/tracing/AsyncWrap/README.md
 
 ```javascript
 const asyncHook = require('async-hook');
