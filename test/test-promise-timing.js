@@ -31,7 +31,9 @@ new Promise(function (s) {
 .then();
 
 process.once('exit', function () {
-  if (process.version.slice(0, 3) == 'v6.') {
+  const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
+
+  if (nodeMajor >= 6) {
     assert.deepEqual(eventOrder, [
       'init#-1 TimeoutWrap',
       'init#-2 PromiseWrap',
