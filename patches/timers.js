@@ -98,7 +98,7 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
   timers[clearFn] = function (timerId) {
     // If clear* was called within the timer callback, then delay the destroy
     // event to after the post event has been called.
-    if (activeCallback === timerId) {
+    if (activeCallback === timerId && timerId !== null) {
       clearedInCallback = true;
     }
     // clear should call the destroy hook. Note if timerId doesn't exists
