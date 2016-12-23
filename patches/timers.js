@@ -10,6 +10,9 @@ const timeoutMap = new Map();
 const intervalMap = new Map();
 const ImmediateMap = new Map();
 
+let activeCallback = null;
+let clearedInCallback = false;
+
 module.exports = function patch() {
   patchTimer(this._hooks, this._state, 'setTimeout', 'clearTimeout', TimeoutWrap, timeoutMap, true);
   patchTimer(this._hooks, this._state, 'setInterval', 'clearInterval', IntervalWrap, intervalMap, false);
@@ -49,6 +52,7 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
     // overwrite callback
     args[0] = function () {
       // call the pre hook
+      activeCallback = timerId;
       hooks.pre.call(handle, uid);
 
       let didThrow = true;
@@ -72,9 +76,11 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
 
       // callback done successfully
       hooks.post.call(handle, uid, false);
+      activeCallback = null;
 
       // call the destroy hook if the callback will only be called once
-      if (singleCall) {
+      if (singleCall || clearedInCallback) {
+        clearedInCallback = false;
         timerMap.delete(timerId);
         hooks.destroy.call(null, uid);
       }
@@ -90,9 +96,14 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
 
   // overwrite clear[Timeout]
   timers[clearFn] = function (timerId) {
+    // If clear* was called within the timer callback, then delay the destroy
+    // event to after the post event has been called.
+    if (activeCallback === timerId) {
+      clearedInCallback = true;
+    }
     // clear should call the destroy hook. Note if timerId doesn't exists
     // it is because asyncWrap wasn't enabled at the time.
-    if (timerMap.has(timerId)) {
+    else if (timerMap.has(timerId)) {
       const uid = timerMap.get(timerId);
       timerMap.delete(timerId);
       hooks.destroy.call(null, uid);
