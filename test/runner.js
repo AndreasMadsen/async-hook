@@ -35,7 +35,10 @@ function runTest(filename, done) {
   process.stdout.write(` - running ${filename} ...`);
 
   const p = spawn(process.execPath, [path.resolve(__dirname, filename)], {
-    stdio: ['ignore', 1, 2]
+    stdio: ['ignore', 1, 2],
+    env: {
+      'NODE_ASYNC_HOOK_NO_WARNING': '1'
+    }
   });
 
   p.once('close', function (statusCode) {

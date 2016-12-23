@@ -103,7 +103,9 @@ function AsyncHook() {
   }
 
   // setup async wrap
-  console.error('warning: you are using async-hook which is unstable.');
+  if (!process.env.hasOwnProperty('NODE_ASYNC_HOOK_NO_WARNING')) {
+    console.error('warning: you are using async-hook which is unstable.');
+  }
   asyncWrap.setupHooks({
     init: this._hooks.init,
     pre: this._hooks.pre,
