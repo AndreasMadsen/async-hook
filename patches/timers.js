@@ -35,7 +35,7 @@ function patchTimer(hooks, state, setFn, clearFn, Handle, timerMap, singleCall) 
   timers[setFn] = function () {
     if (!state.enabled) return oldSetFn.apply(timers, arguments);
 
-    const args = [];
+    const args = new Array(arguments.length);
     for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
     }

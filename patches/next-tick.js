@@ -10,7 +10,7 @@ module.exports = function patch() {
   process.nextTick = function () {
     if (!state.enabled) return oldNextTick.apply(process, arguments);
 
-    const args = [];
+    const args = new Array(arguments.length);
     for (let i = 0; i < arguments.length; i++) {
       args[i] = arguments[i];
     }
